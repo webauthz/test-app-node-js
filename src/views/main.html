@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Webauthz Test Application</title>
+        <style>
+            body {
+                font-family: 'Open Sans', Geneva, Tahoma, sans-serif;
+            }
+            .error {
+                color: #770000;
+            }
+            .webauthz {
+                color: #007700;
+            }
+            pre {
+                border: 1px solid black;
+                padding: 5px;
+                max-width: 800px;
+            }
+        </style>        
+    </head>
+    <body>
+        <h1>Webauthz Test Application</h1>
+
+        {{#username}}
+        <p>You are logged in as {{ username }}.</p>
+        <form action="/logout" method="POST">
+            <input type="submit" value="Logout"/>
+        </form>
+        <form action="/resource" method="GET">
+            <label for="resourceInput">Resource URL</label>
+            <input name="url" value="{{{ url }}}" size="48" id="resourceInput"/>
+            <input type="submit" value="Access"/>
+            {{#error}}<p class="error">{{ error }}</p>{{/error}}
+        </form>
+        {{#webauthz}}<p class="webauthz">The resource supports Webauthz.</p><p><a href="{{{ webauthz }}}">Request access</a></p>{{/webauthz}}
+        {{#content}}<pre>{{ content }}</pre>{{/content}}
+        {{/username}}
+
+        {{^username}}
+        <p>Choose any usename to log in</p>
+        <form action="/login" method="POST">
+            <label for="username">Username</label>
+            <input name="username" value="{{ username }}" size="48" id="username"/>
+            <input type="submit" value="Login"/>
+            {{#error}}<p class="error">{{ error }}</p>{{/error}}
+        </form>
+        {{/username}}
+</body>
+</html>
