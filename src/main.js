@@ -149,17 +149,21 @@ async function httpGetResource(req, res) {
     } catch (err) {
         // request failed, check for a Webauthz challenge in the response
         if (err.response) {
-            const webauthzInfo = await webauthzPlugin.checkResponseForWebauthz({ user_id: req.session.username, resource_uri: resourceURL, http_response: err.response });
-            if (webauthzInfo) {
-                // found a Webauthz challenge; prepare a Webauthz access request for the resource
-                const { access_request_uri } = await webauthzPlugin.createAccessRequest(webauthzInfo, { method: 'GET' });
-                // show the error we got from the resource, and also the fact that it supports Webauthz
-                return res.render('main', {
-                    error: `${err.response.status} ${err.response.statusText}`,
-                    url: resourceURL,
-                    webauthz: access_request_uri,
-                    username: req.session.username
-                });
+            try {
+                const webauthzInfo = await webauthzPlugin.checkResponseForWebauthz({ user_id: req.session.username, resource_uri: resourceURL, http_response: err.response });
+                if (webauthzInfo) {
+                    // found a Webauthz challenge; prepare a Webauthz access request for the resource
+                    const { access_request_uri } = await webauthzPlugin.createAccessRequest(webauthzInfo, { method: 'GET' });
+                    // show the error we got from the resource, and also the fact that it supports Webauthz
+                    return res.render('main', {
+                        error: `${err.response.status} ${err.response.statusText}`,
+                        url: resourceURL,
+                        webauthz: access_request_uri,
+                        username: req.session.username
+                    });
+                }
+            } catch (err2) {
+                console.error(`httpGetResource: webauthz check failed`, err2);
             }
             // did not find a Webauthz challenge; show the status from the http response
             return res.render('main', { error: `${err.response.status} ${err.response.statusText}`, url: resourceURL, username: req.session.username });
@@ -168,7 +172,7 @@ async function httpGetResource(req, res) {
         }
     }
 
-    return res.render('main', { error: 'unauthorized', url: resourceURL, username: req.session.username });
+    return res.render('main', { error: 'request failed', url: resourceURL, username: req.session.username });
 }
 
 async function httpGetWebauthzGrant(req, res) {
