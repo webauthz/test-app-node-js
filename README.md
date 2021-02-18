@@ -358,6 +358,10 @@ is logged in. Such application-wide access tokens could be stored in
 a separate location or with an invalid user id like `#system` so they
 cannot be accidentally used by a user with the same id.
 
+The `client_id` and `client_token` (one pair for each authorization
+server) should be stored as application settings and re-used with all
+API requests to that authorization server on behalf of all users.
+
 ## Exchange with refresh token
 
 When the application loads an access token, the application checks the
