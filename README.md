@@ -333,6 +333,31 @@ For example:
 const access_token_not_after_millis = Date.now() + (access_token_max_seconds * 1000);
 ```
 
+## Multiple users and application settings
+
+A multi-user application must keep a separate repository of access tokens
+for each user and for its own configuration.
+
+For example, if an application has users Alice and Bob, and both of them
+authorize access to their own resources at `https://api.resource.test`,
+there should be two separate access tokens stored, each one associated
+with the user id in addition to origin and path.
+
+When using a relational database to store access tokens, this could mean
+a separate column. When using a flat database, this could mean creating
+identifiers with a format like `${user_id}|${origin}|${path}`.
+
+Access tokens that are part of application settings should be kept
+separately from any user tokens. An application that uses
+an authentication service, a spam filtering service, etc. that is
+configured once and used with all users, would store its access token
+for that resource in application settings instead of an individual
+user setting. This is because if the access token is associated to the
+administrator who obtained it, it wouldn't be usable when someone else
+is logged in. Such application-wide access tokens could be stored in
+a separate location or with an invalid user id like `#system` so they
+cannot be accidentally used by a user with the same id.
+
 ## Exchange with refresh token
 
 When the application loads an access token, the application checks the
